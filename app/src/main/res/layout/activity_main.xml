@@ -148,45 +148,20 @@
             android:layout_height="wrap_content"
             android:text="Pick Documents"/>
 
-        <TextView
-            android:text="Create Directory "
-            android:textSize="16sp"
-            android:textStyle="bold"
+        <ImageView
+            android:id="@+id/Iv_downloadable_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginTop="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/et_directory_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter directory name"/>
+            android:layout_gravity="center_horizontal"
+            android:scaleType="centerCrop"/>
 
         <Button
-            android:id="@+id/btn_create_directory"
+            android:id="@+id/btn_download_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create Directory"/>
-
-        <TextView
-            android:text="Create File "
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/et_file_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter File name"/>
-
-        <Button
-            android:id="@+id/btn_create_file"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Create File"/>
+            android:layout_marginTop="10dp"
+            android:text="Download Image"/>
 
     </LinearLayout>
 

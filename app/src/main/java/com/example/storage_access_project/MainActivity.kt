@@ -9,12 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.storage_access_project.databinding.ActivityMainBinding
+import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
 
     // region class variables
     private lateinit var mViewBinding: ActivityMainBinding
     private var isPickingMedia = false
+    private val dummyImageUrl = "https://i.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI"
     // end region
 
     // region lifecycle methods
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mViewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mViewBinding.root)
+        setImageFromUrl()
         setClickListeners()
     }
     // end region
@@ -31,29 +34,31 @@ class MainActivity : AppCompatActivity() {
         mViewBinding.apply {
             btnPickMedia.setOnClickListener {
                 isPickingMedia = true
-                isAndroid11OrAbove {
-                    if(it)
-                        startPhotoPickerLauncher()
-                    else {
-                        if (!checkReadPermission())
-                            requestForPermissions()
-                        else
-                            startMediaLauncher()
-                    }
+                isAndroid13AndAbove {
+                    startPhotoPickerLauncher()
+                } ?: run {
+                    if (checkReadPermission())
+                        startMediaLauncher()
+                    else
+                        requestReadPermissions()
                 }
             }
             btnPickDocuments.setOnClickListener {
                 isPickingMedia = false
-                isAndroid13OrAbove {
-                    if (it)
+                isAndroid13AndAbove {
+                    startDocumentLauncher()
+                } ?: run {
+                    if (checkReadPermission())
                         startDocumentLauncher()
-                    else {
-                        if (!checkReadPermission())
-                            requestForPermissions()
-                        else
-                            startDocumentLauncher()
-                    }
+                    else
+                        requestReadPermissions()
                 }
+            }
+            btnDownloadImage.setOnClickListener {
+                isAndroid9AndBelow {
+                    if (checkWritePermission()) downloadFileFromURL(dummyImageUrl)
+                    else requestWritePermissions()
+                } ?: downloadFileFromURL(dummyImageUrl)
             }
         }
     }
@@ -92,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private val requestPermissionLauncher =
+    private val readPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -101,8 +106,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private fun requestForPermissions() {
-        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun requestReadPermissions() {
+        readPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+
+    private val writePermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                downloadFileFromURL(dummyImageUrl)
+            }
+        }
+
+    private fun requestWritePermissions() {
+        writePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 
     private val photoPickerLauncher =
@@ -134,6 +152,10 @@ class MainActivity : AppCompatActivity() {
             }
             tvBase64String.text = uri.getUriFromBase64(this@MainActivity)
         }
+    }
+
+    private fun setImageFromUrl() {
+        Picasso.get().load(dummyImageUrl).into(mViewBinding.IvDownloadableImage)
     }
     // end region
 
